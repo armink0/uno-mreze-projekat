@@ -11,7 +11,6 @@ public class UserThread extends Thread {
 	private Socket socket;
 	private BufferedReader bufferedReader;
 	private PrintWriter printWriter;
-	private int n = 0;
 
 	UserThread(Server server, Socket socket) {
 		try {
@@ -20,7 +19,6 @@ public class UserThread extends Thread {
 
 			this.bufferedReader = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
 			this.printWriter = new PrintWriter(this.socket.getOutputStream(), true);
-			n = 0;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -38,8 +36,7 @@ public class UserThread extends Thread {
 					break;
 				}
 				
-				printWriter.println(clientMessage + n);
-				n++;
+				printWriter.println(clientMessage);
 			} while (!clientMessage.equals("exit"));
 
 		} catch (IOException ex) {
