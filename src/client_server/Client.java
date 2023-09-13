@@ -5,11 +5,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+
+import javafx.application.Platform;
 
 public class Client {
 	private Socket socket;
 	private BufferedReader bufferedReader;
 	private PrintWriter printWriter;
+
+	private static ArrayList<String> ruka = new ArrayList<>();
+	private Runnable spremniPodaci;
 
 	Client(Socket socket) {
 		try {
@@ -23,31 +29,51 @@ public class Client {
 	}
 
 	public void posaljiPorukuServeru(String string) {
-		// new Thread(new Runnable() {
-//			@Override
-//			public void run() {
-		try {
-			printWriter.println(string);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					printWriter.println(string);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+
+		}).start();
 	}
 
-//		}).start();
-//	}
+	public void setSpremni(Runnable callback) {
+		spremniPodaci = callback;
+	}
 
-	public void vratiPorukuOdServera() {
+	public void fromServer(String s) {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
 				try {
-					String line = bufferedReader.readLine();
-					System.out.println(line);
+					printWriter.println(s);
+					int n = 1;
+					if (s.equals("2")) {
+						n = 5;
+					}
+
+					for (int i = 0; i < n; i++) {
+						String line = bufferedReader.readLine();
+						ruka.add(line);
+					}
+
+					n = 1;
+
+					Platform.runLater(spremniPodaci);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		}).start();
+	}
+
+	public static ArrayList<String> getRuka() {
+		return ruka;
 	}
 }

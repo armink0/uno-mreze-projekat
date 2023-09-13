@@ -1,6 +1,7 @@
 package client_server;
 
 import java.net.Socket;
+import java.util.ArrayList;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -8,6 +9,7 @@ import javafx.geometry.Pos;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
@@ -27,23 +29,52 @@ public class ClientController extends Application {
 		root.setAlignment(Pos.CENTER);
 		root.setPadding(new Insets(25));
 
-		TextField ta = new TextField();
+		ListView<String> listView = new ListView<>();
+		listView.setMaxSize(200, 200);
 
-		Button b = new Button("dodaj text");
+		Button vratiKarte = new Button("vrati karte u ruci");
 
-		b.setOnAction(e -> {
-			if (!ta.getText().isEmpty()) {
-				synchronized (this) {
-					client.posaljiPorukuServeru(ta.getText());
-					client.vratiPorukuOdServera();
-				}
+		vratiKarte.setOnAction(e -> {
+			listView.getItems().clear();
+
+			synchronized (client) {
+				client.fromServer("1");
 			}
 
-			ta.clear();
+			client.setSpremni(() -> {
+				ArrayList<String> list = new ArrayList<>();
+
+				for (String s : Client.getRuka()) {
+					list.add(s);
+				}
+
+				listView.getItems().addAll(list);
+			});
+		});
+		
+		Button popuniKarte = new Button("popuni karte u ruci");
+
+		popuniKarte.setOnAction(e -> {
+			listView.getItems().clear();
+
+			synchronized (client) {
+				client.fromServer("2");
+			}
+
+			client.setSpremni(() -> {
+				ArrayList<String> list = new ArrayList<>();
+
+				for (String s : Client.getRuka()) {
+					list.add(s);
+				}
+
+				listView.getItems().addAll(list);
+			});
+			
+			popuniKarte.setDisable(true);
 		});
 
-
-		root.getChildren().addAll(ta, b);
+		root.getChildren().addAll(listView, vratiKarte, popuniKarte);
 		Scene scene = new Scene(root, 400, 400);
 
 		primaryStage.setScene(scene);
