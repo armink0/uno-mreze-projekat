@@ -11,8 +11,6 @@ public class UserThread extends Thread {
 	private BufferedReader bufferedReader;
 	private PrintWriter printWriter;
 
-	private int n;
-
 	UserThread(Socket socket) {
 		try {
 			this.socket = socket;
@@ -24,6 +22,11 @@ public class UserThread extends Thread {
 		}
 	}
 
+	public void posaljiPoruku(String poruka) {
+//		printWriter.println(poruka);
+		System.out.println(Server.getTrenutnaKarta());
+	}
+
 	@Override
 	public void run() {
 		try {
@@ -32,30 +35,28 @@ public class UserThread extends Thread {
 			do {
 				// Read message from user
 				clientMessage = bufferedReader.readLine();
+
 				if (clientMessage == null) {
 					break;
 				}
-<<<<<<< HEAD
-				
-				printWriter.println(clientMessage);
-=======
 
-				if (clientMessage.equals("1")) {
-					n = Server.oduzmiKartaLista();
-					printWriter.println(n + ", " + Server.getKartaListaSize());
-				} else if (clientMessage.equals("2")) {
-					for (int i = 0; i < 5; i++) {
-						n = Server.oduzmiKartaLista();
-						printWriter.println(n + ", " + Server.getKartaListaSize());
+				if (clientMessage.equals("0")) {
+					printWriter.println(Server.getTrenutnaKarta() + ", " + Server.getKartaListaSize());
+				} else if (clientMessage.equals("1") || clientMessage.equals("2")) {
+					if (Server.getKartaListaSize() > 0) {
+						int karta = Server.getZadnjaKarta();
+						printWriter.println(karta + ", " + Server.getKartaListaSize());
 					}
-				} else {
-					n = Server.getKartaListaSize();
+				} else if (clientMessage.equals("3")) {
+					String tk = bufferedReader.readLine();
+					Server.setTrenutnaKarta(Integer.parseInt(tk));
+				} else if (clientMessage.equals("4")) {
+					printWriter.println(Server.getTrenutnaKarta() + ", " + Server.getKartaListaSize());
 				}
-
->>>>>>> b614b23 (popravka servera i klijenta)
 			} while (!clientMessage.equals("exit"));
+		} catch (
 
-		} catch (IOException ex) {
+		IOException ex) {
 			System.out.println("Greska u UserThread: " + ex.getMessage());
 			ex.printStackTrace();
 		} finally {
