@@ -8,8 +8,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
-import javafx.application.Platform;
-
 public class Client {
 	private Socket socket;
 	protected BufferedReader bufferedReader;
@@ -17,7 +15,8 @@ public class Client {
 
 	private static ArrayList<String> ruka = new ArrayList<>();
 	public static String trenutnaKarta;
-	private Runnable spremniPodaci;
+
+	private static String gotovo = "nastavi";
 
 	Client(Socket socket) {
 		try {
@@ -30,24 +29,6 @@ public class Client {
 		}
 	}
 
-	public void fromServer() {
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					String line;
-
-					if ((line = bufferedReader.readLine()) != null) {
-						trenutnaKarta = line;
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-
-		}).start();
-	}
-
 	public CompletableFuture<String> toServer(String s) {
 		CompletableFuture<String> future = new CompletableFuture<>();
 
@@ -57,25 +38,42 @@ public class Client {
 				// TODO Auto-generated method stub
 				try {
 					printWriter.println(s);
+					String line;
 
-					if (s.equals("0")) {
+					if (s.equals("-1")) {
+						line = bufferedReader.readLine();
+
+						Client.setGotovo(line);
+
+						future.complete(Client.getGotovo());
+					} else if (s.equals("0")) {
 						trenutnaKarta = bufferedReader.readLine();
 
 						future.complete(trenutnaKarta);
 					} else if (s.equals("1") || s.equals("2")) {
-						String line = bufferedReader.readLine();
+						line = bufferedReader.readLine();
 
-						if (line != null || !line.equals("0, 0")) {
+						if (line != null) {
 							future.complete(line);
 						}
 					} else if (s.equals("3")) {
-						printWriter.println(Integer.parseInt(trenutnaKarta.split(", ")[0]));
+						String trenutna = trenutnaKarta.split(", ")[0];
+						printWriter.println(Integer.parseInt(trenutna));
+
+						if (getRuka().size() == 1) {
+							printWriter.println("gotovo");
+						} else {
+							printWriter.println("nastavi");
+						}
+
+						Client.setGotovo(bufferedReader.readLine());
 
 						future.complete(trenutnaKarta);
 					} else if (s.equals("4")) {
-						String line = bufferedReader.readLine();
+						line = bufferedReader.readLine();
 
 						trenutnaKarta = line;
+
 						future.complete(trenutnaKarta);
 					}
 				} catch (Exception e) {
@@ -87,19 +85,7 @@ public class Client {
 		return future;
 	}
 
-//	public static String getTrenutnaKarta() {
-//		return trenutnaKarta;
-//	}
-
-//	public void setSpremni(Runnable callback) {
-//		spremniPodaci = callback;
-//	}
-//
-//	public static String getTrenutnaKarta() {
-//		return trenutnaKarta;
-//	}
-//
-	public static void updateRuka(String trenutnaKarta) {
+	public synchronized static void updateRuka(String trenutnaKarta) {
 		ruka.removeIf(e -> e.equals(trenutnaKarta));
 	}
 
@@ -107,7 +93,15 @@ public class Client {
 		ruka.add(karta);
 	}
 
-	public static ArrayList<String> getRuka() {
+	public synchronized static ArrayList<String> getRuka() {
 		return ruka;
+	}
+
+	public synchronized static String getGotovo() {
+		return gotovo;
+	}
+
+	public synchronized static void setGotovo(String gotovo) {
+		Client.gotovo = gotovo;
 	}
 }

@@ -22,11 +22,6 @@ public class UserThread extends Thread {
 		}
 	}
 
-	public void posaljiPoruku(String poruka) {
-//		printWriter.println(poruka);
-		System.out.println(Server.getTrenutnaKarta());
-	}
-
 	@Override
 	public void run() {
 		try {
@@ -40,7 +35,9 @@ public class UserThread extends Thread {
 					break;
 				}
 
-				if (clientMessage.equals("0")) {
+				if (clientMessage.equals("-1")) {
+					printWriter.println(Server.getGotovo());
+				} else if (clientMessage.equals("0")) {
 					printWriter.println(Server.getTrenutnaKarta() + ", " + Server.getKartaListaSize());
 				} else if (clientMessage.equals("1") || clientMessage.equals("2")) {
 					if (Server.getKartaListaSize() > 0) {
@@ -50,13 +47,19 @@ public class UserThread extends Thread {
 				} else if (clientMessage.equals("3")) {
 					String tk = bufferedReader.readLine();
 					Server.setTrenutnaKarta(Integer.parseInt(tk));
+
+					clientMessage = bufferedReader.readLine();
+
+					if (clientMessage.equals("gotovo")) {
+						Server.setGotovo("gotovo");
+					}
+
+					printWriter.println(Server.getGotovo());
 				} else if (clientMessage.equals("4")) {
 					printWriter.println(Server.getTrenutnaKarta() + ", " + Server.getKartaListaSize());
 				}
 			} while (!clientMessage.equals("exit"));
-		} catch (
-
-		IOException ex) {
+		} catch (IOException ex) {
 			System.out.println("Greska u UserThread: " + ex.getMessage());
 			ex.printStackTrace();
 		} finally {
@@ -67,5 +70,10 @@ public class UserThread extends Thread {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public void sendMessage(String message) {
+		// TODO Auto-generated method stub
+		printWriter.println("poraz");
 	}
 }

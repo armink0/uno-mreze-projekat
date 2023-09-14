@@ -17,6 +17,8 @@ public class Server {
 	private static ArrayList<UserThread> korisniciLista = new ArrayList<>();
 	private static ArrayList<Integer> kartaLista = new ArrayList<>();
 	private static int trenutnaKarta;
+	
+	private static String gotovo = "nastavi";
 
 	public static void main(String[] args) {
 		Server server = new Server();
@@ -26,12 +28,6 @@ public class Server {
 	public synchronized static void setTrenutnaKarta(int trenutnaKarta) {
 		Server.trenutnaKarta = trenutnaKarta;
 	}
-
-//	public static void broadcast(String poruka) {
-//		for (UserThread ut : korisniciLista) {
-//			ut.posaljiPoruku(poruka);
-//		}
-//	}
 
 	public synchronized static int getTrenutnaKarta() {
 		return Server.trenutnaKarta;
@@ -59,6 +55,20 @@ public class Server {
 		return kartaLista.remove(kartaLista.size() - 1);
 	}
 
+	public synchronized static String getGotovo() {
+		return gotovo;
+	}
+
+	public synchronized static void setGotovo(String gotovo) {
+		Server.gotovo = gotovo;
+	}
+
+	public static void broadcast(UserThread sender, String message) {
+		synchronized (korisniciLista) {
+			korisniciLista.stream().filter(u -> u != sender).forEach(u -> u.sendMessage(message));
+		}
+	}
+
 	void execute() {
 		try {
 			this.serverSocket = new ServerSocket(DEFAULT_PORT);
@@ -72,11 +82,16 @@ public class Server {
 
 			trenutnaKarta = kartaLista.remove(kartaLista.size() - 1);
 
+			int i = 0;
+
 			while (true) {
 				this.socket = serverSocket.accept();
 				System.out.println("Povezan korisnik");
 
+//				i++;
+
 				UserThread user = new UserThread(socket);
+
 				korisniciLista.add(user);
 
 				user.start();
