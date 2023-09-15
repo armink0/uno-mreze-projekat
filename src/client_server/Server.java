@@ -91,13 +91,9 @@ public class Server {
 
 			trenutnaKarta = kartaLista.remove(kartaLista.size() - 1);
 
-			int i = 0;
-
 			while (true) {
 				this.socket = serverSocket.accept();
 				System.out.println("Povezan korisnik");
-
-//				i++;
 
 				UserThread user = new UserThread(socket);
 

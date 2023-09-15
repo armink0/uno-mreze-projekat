@@ -17,14 +17,15 @@ public class Client {
 	public static String trenutnaKarta;
 
 	private static String gotovo = "nastavi";
+	public static String naPotezu = ", na potezu";
 
 	private static int broj = 1;
 
 	Client(Socket socket) {
 		try {
 			this.socket = socket;
-			this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			this.printWriter = new PrintWriter(socket.getOutputStream(), true);
+			this.bufferedReader = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+			this.printWriter = new PrintWriter(this.socket.getOutputStream(), true);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -80,13 +81,25 @@ public class Client {
 
 							printWriter.println(getBroj());
 
+							naPotezu = ", na potezu";
+
 							future.complete(trenutnaKarta);
+						} else {
+							naPotezu = "";
 						}
 
 					} else if (s.equals("4")) {
 						line = bufferedReader.readLine();
 
 						trenutnaKarta = line;
+
+						line = bufferedReader.readLine();
+
+						if (getBroj() != Integer.parseInt(line)) {
+							naPotezu = ", na potezu";
+						} else {
+							naPotezu = "";
+						}
 
 						future.complete(trenutnaKarta);
 					}

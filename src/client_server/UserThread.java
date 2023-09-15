@@ -54,6 +54,7 @@ public class UserThread extends Thread {
 
 					if (broj != Server.getBroj()) {
 						String tk = bufferedReader.readLine();
+
 						Server.setTrenutnaKarta(Integer.parseInt(tk));
 
 						clientMessage = bufferedReader.readLine();
@@ -69,6 +70,8 @@ public class UserThread extends Thread {
 					}
 				} else if (clientMessage.equals("4")) {
 					printWriter.println(Server.getTrenutnaKarta() + ", " + Server.getKartaListaSize());
+
+					printWriter.println(Server.getBroj());
 				}
 			} while (!clientMessage.equals("exit"));
 		} catch (IOException ex) {

@@ -35,6 +35,7 @@ public class ClientController extends Application {
 		Button vratiKartu = new Button("povuci kartu");
 
 		Button odigrajKartu = new Button("odigraj kartu");
+		odigrajKartu.setDisable(true);
 
 		Button refresuj = new Button("refresuj tabelu");
 
@@ -45,22 +46,23 @@ public class ClientController extends Application {
 			client.toServer("0").thenApply(res -> {
 				Platform.runLater(() -> prikazTrenutne.setText(res + ", " + Client.getBroj()));
 				return res;
+			}).thenRun(() -> {
+				for (int i = 0; i < Server.POCETNO; i++) {
+					client.toServer("1").thenApply(res -> {
+						Platform.runLater(() -> {
+							listView.getItems().clear();
+							Client.addRuka(res);
+
+							for (String karta : Client.getRuka()) {
+								listView.getItems().add(karta);
+							}
+						});
+
+						return res;
+					});
+				}
 			});
 
-			for (int i = 0; i < Server.POCETNO; i++) {
-				client.toServer("1").thenApply(res -> {
-					Platform.runLater(() -> {
-						listView.getItems().clear();
-						Client.addRuka(res);
-
-						for (String karta : Client.getRuka()) {
-							listView.getItems().add(karta);
-						}
-					});
-
-					return res;
-				});
-			}
 		} catch (Exception e) {
 			// ignorisi
 		}
@@ -86,10 +88,11 @@ public class ClientController extends Application {
 
 			if (s != null) {
 				Client.trenutnaKarta = s;
+				odigrajKartu.setDisable(true);
 
 				client.toServer("3").thenApply(res -> {
 					Platform.runLater(() -> {
-						prikazTrenutne.setText(res + ", " + Client.getBroj());
+						prikazTrenutne.setText(res);
 
 						Client.updateRuka(res);
 
@@ -107,6 +110,7 @@ public class ClientController extends Application {
 						for (String karta : Client.getRuka()) {
 							listView.getItems().add(karta);
 						}
+
 					});
 
 					return res;
@@ -117,26 +121,28 @@ public class ClientController extends Application {
 		refresuj.setOnAction(e -> {
 			client.toServer("4").thenApply(res -> {
 				Platform.runLater(() -> {
-					prikazTrenutne.setText(res + ", " + Client.getBroj());
+					prikazTrenutne.setText(res + Client.naPotezu);
 				});
 
 				return res;
-			});
-
-			client.toServer("-1").thenApply(res -> {
-				Platform.runLater(() -> {
-					if (Client.getGotovo().equals("gotovo")) {
-						if (Client.getRuka().size() != 0) {
-							stanje.setText("poraz");
-							stanje.setTextFill(Color.RED);
-							vratiKartu.setDisable(true);
-							odigrajKartu.setDisable(true);
-							refresuj.setDisable(true);
+			}).thenRun(() -> {
+				client.toServer("-1").thenApply(res -> {
+					Platform.runLater(() -> {
+						if (Client.getGotovo().equals("gotovo")) {
+							if (Client.getRuka().size() != 0) {
+								stanje.setText("poraz");
+								stanje.setTextFill(Color.RED);
+								vratiKartu.setDisable(true);
+								odigrajKartu.setDisable(true);
+								refresuj.setDisable(true);
+							}
+						} else {
+							odigrajKartu.setDisable(false);
 						}
-					}
-				});
+					});
 
-				return res;
+					return res;
+				});
 			});
 		});
 
