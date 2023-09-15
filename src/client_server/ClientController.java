@@ -4,6 +4,8 @@ import java.net.Socket;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
@@ -116,9 +118,8 @@ public class ClientController extends Application {
 
 			if (s.contains("na potezu")) {
 				client.toServer("2").thenApply(res -> {
-					Platform.runLater(() -> {
-						System.out.println("aaaa");
 
+					Platform.runLater(() -> {
 						listView.getItems().clear();
 
 						Client.addRuka(res);
@@ -134,40 +135,52 @@ public class ClientController extends Application {
 		});
 
 		odigrajKartu.setOnAction(e -> {
-			String s = listView.getSelectionModel().getSelectedItem();
+			String getTrenutna = listView.getSelectionModel().getSelectedItem();
 
-			if (s != null) {
-				Client.trenutnaKarta = s;
+			if (getTrenutna != null) {
+				String[] trenutnaKarta = getTrenutna.split(", ");
 				odigrajKartu.setDisable(true);
-				povuciKartu.setDisable(true);
-				preskoci.setDisable(true);
 				refresuj.setDisable(false);
 
-				client.toServer("3").thenApply(res -> {
-					Platform.runLater(() -> {
-						prikazTrenutne.setText(res);
+				String[] izabranaKarta = prikazTrenutne.getText().split(", ");
 
-						Client.updateRuka(res);
+				boolean dopustiTrenutna = trenutnaKarta[0].equals("+2") || trenutnaKarta[0].equals("+4");
+				boolean dopustiIzabrana = izabranaKarta[0].equals("+2") || izabranaKarta[0].equals("+4");
 
-						listView.getItems().clear();
+				boolean dopusti = (dopustiTrenutna || dopustiIzabrana || trenutnaKarta[0].equals(izabranaKarta[0])
+						|| trenutnaKarta[1].equals(izabranaKarta[1]));
 
-						if (Client.getGotovo().equals("gotovo")) {
-							Client.setGotovo("pobjeda");
-							stanje.setText("pobjeda");
-							stanje.setTextFill(Color.GREEN);
-							povuciKartu.setDisable(true);
-							odigrajKartu.setDisable(true);
-							refresuj.setDisable(true);
-						}
+				if (trenutnaKarta != null && prikazTrenutne.getText().contains("na potezu") && dopusti) {
+					Client.trenutnaKarta = trenutnaKarta[0] + ", " + trenutnaKarta[1];
+					povuciKartu.setDisable(true);
+					preskoci.setDisable(true);
 
-						for (String karta : Client.getRuka()) {
-							listView.getItems().add(karta);
-						}
+					client.toServer("3").thenApply(res -> {
+						Platform.runLater(() -> {
+							prikazTrenutne.setText(res);
 
+							Client.updateRuka(res);
+
+							listView.getItems().clear();
+
+							if (Client.getGotovo().equals("gotovo")) {
+								Client.setGotovo("pobjeda");
+								stanje.setText("pobjeda");
+								stanje.setTextFill(Color.GREEN);
+								povuciKartu.setDisable(true);
+								odigrajKartu.setDisable(true);
+								refresuj.setDisable(true);
+							}
+
+							for (String karta : Client.getRuka()) {
+								listView.getItems().add(karta);
+							}
+
+						});
+
+						return res;
 					});
-
-					return res;
-				});
+				}
 			}
 		});
 
@@ -190,6 +203,30 @@ public class ClientController extends Application {
 			client.toServer("4").thenApply(res -> {
 				Platform.runLater(() -> {
 					prikazTrenutne.setText(res + Client.naPotezu);
+
+					int n = 0;
+
+					String getTrenutna = prikazTrenutne.getText();
+
+					if (getTrenutna != null) {
+						String[] trenutnaKarta = getTrenutna.split(", ");
+
+						if (trenutnaKarta[0].equals("+2")) {
+							n = 2;
+						} else if (trenutnaKarta[0].equals("+4")) {
+							n = 4;
+						}
+
+						if (prikazTrenutne.getText().contains("na potezu")) {
+							for (int i = 0; i < n; i++) {
+								EventHandler<ActionEvent> onActionHandler = povuciKartu.getOnAction();
+
+								if (onActionHandler != null) {
+									onActionHandler.handle(new ActionEvent());
+								}
+							}
+						}
+					}
 				});
 
 				return res;
@@ -208,6 +245,13 @@ public class ClientController extends Application {
 							odigrajKartu.setDisable(false);
 							povuciKartu.setDisable(false);
 							preskoci.setDisable(false);
+						}
+
+						String trenutnaKarta = prikazTrenutne.getText();
+
+						if ((trenutnaKarta.contains("+2") || trenutnaKarta.equals("+4"))
+								&& trenutnaKarta.contains("na potezu")) {
+							preskoci.setDisable(true);
 						}
 					});
 

@@ -99,6 +99,9 @@ public class Server {
 				for (int j = 1; j <= 9; j++) {
 					kartaLista.add(j + ", " + boja);
 				}
+
+				kartaLista.add("+2, crna");
+				kartaLista.add("+4, crna");
 			}
 
 			Collections.shuffle(kartaLista);
