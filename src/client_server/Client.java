@@ -117,12 +117,23 @@ public class Client {
 						future.complete(trenutnaKarta);
 					}
 				} catch (Exception e) {
-					e.printStackTrace();
+					zatvori();
 				}
 			}
 		}).start();
 
 		return future;
+	}
+
+	private void zatvori() {
+		try {
+			bufferedReader.close();
+			printWriter.close();
+			socket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public synchronized static void updateRuka(String trenutnaKarta) {

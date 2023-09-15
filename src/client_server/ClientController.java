@@ -265,7 +265,7 @@ public class ClientController extends Application {
 		Scene scene = new Scene(root, 400, 400);
 
 		primaryStage.setScene(scene);
-		primaryStage.setTitle("Klijent");
+		primaryStage.setTitle("Korisnik");
 		primaryStage.show();
 	}
 

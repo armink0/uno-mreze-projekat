@@ -64,12 +64,6 @@ public class Server {
 		Server.gotovo = gotovo;
 	}
 
-	public static void broadcast(UserThread sender, String message) {
-		synchronized (korisniciLista) {
-			korisniciLista.stream().filter(u -> u != sender).forEach(u -> u.sendMessage(message));
-		}
-	}
-
 	public synchronized static int getBroj() {
 		return broj;
 	}

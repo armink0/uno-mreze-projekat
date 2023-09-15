@@ -77,22 +77,22 @@ public class UserThread extends Thread {
 					int broj = Integer.parseInt(bufferedReader.readLine());
 					Server.setBroj(broj);
 				}
-			} while (!clientMessage.equals("exit"));
+			} while (true);
 		} catch (IOException ex) {
-			System.out.println("Greska u UserThread: " + ex.getMessage());
-			ex.printStackTrace();
+			// ignorisi
 		} finally {
-			// Close socket
-			try {
-				this.socket.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			zatvori();
 		}
 	}
 
-	public void sendMessage(String message) {
-		// TODO Auto-generated method stub
-		printWriter.println("poraz");
+	private void zatvori() {
+		try {
+			bufferedReader.close();
+			printWriter.close();
+			socket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
