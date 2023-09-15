@@ -77,7 +77,6 @@ public class ClientController extends Application {
 			String s = prikazTrenutne.getText();
 
 			if (s.contains("na potezu")) {
-				System.out.println("aaaa");
 				client.toServer("2").thenApply(res -> {
 					Platform.runLater(() -> {
 						listView.getItems().clear();
@@ -94,9 +93,7 @@ public class ClientController extends Application {
 			}
 		});
 
-		odigrajKartu.setOnAction(e ->
-
-		{
+		odigrajKartu.setOnAction(e -> {
 			String s = listView.getSelectionModel().getSelectedItem();
 
 			if (s != null) {
@@ -107,7 +104,6 @@ public class ClientController extends Application {
 				refresuj.setDisable(false);
 
 				client.toServer("3").thenApply(res -> {
-					System.out.println(Client.naPotezu);
 					Platform.runLater(() -> {
 						prikazTrenutne.setText(res);
 

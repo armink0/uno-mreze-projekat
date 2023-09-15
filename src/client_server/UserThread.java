@@ -26,9 +26,11 @@ public class UserThread extends Thread {
 	public void run() {
 		try {
 			String clientMessage;
+			Server.setBroj(Server.getBroj() + 1);
+
+			// printWriter.println(Server.getBroj());
 
 			do {
-				System.out.println(Server.getBroj());
 				// Read message from user
 				clientMessage = bufferedReader.readLine();
 
@@ -39,8 +41,6 @@ public class UserThread extends Thread {
 				if (clientMessage.equals("-1")) {
 					printWriter.println(Server.getGotovo());
 				} else if (clientMessage.equals("0")) {
-					Server.setBroj(Server.getBroj() + 1);
-
 					printWriter.println(Server.getTrenutnaKarta());
 
 					printWriter.println(Server.getBroj());

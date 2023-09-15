@@ -40,6 +40,8 @@ public class Client {
 			public void run() {
 				// TODO Auto-generated method stub
 				try {
+					// setMaxBroj(Integer.parseInt(bufferedReader.readLine()));
+
 					printWriter.println(s);
 					String line;
 
