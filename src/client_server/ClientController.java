@@ -37,6 +37,8 @@ public class ClientController extends Application {
 		Button odigrajKartu = new Button("odigraj kartu");
 		odigrajKartu.setDisable(true);
 
+		Button preskoci = new Button("preskoci potez");
+
 		Button refresuj = new Button("refresuj tabelu");
 
 		try {
@@ -68,6 +70,7 @@ public class ClientController extends Application {
 		}
 
 		vratiKartu.setOnAction(e -> {
+			vratiKartu.setDisable(true);
 			client.toServer("2").thenApply(res -> {
 				Platform.runLater(() -> {
 					listView.getItems().clear();
@@ -89,6 +92,7 @@ public class ClientController extends Application {
 			if (s != null) {
 				Client.trenutnaKarta = s;
 				odigrajKartu.setDisable(true);
+				vratiKartu.setDisable(true);
 
 				client.toServer("3").thenApply(res -> {
 					Platform.runLater(() -> {
@@ -138,6 +142,7 @@ public class ClientController extends Application {
 							}
 						} else {
 							odigrajKartu.setDisable(false);
+							vratiKartu.setDisable(false);
 						}
 					});
 
@@ -146,7 +151,19 @@ public class ClientController extends Application {
 			});
 		});
 
-		root.getChildren().addAll(listView, prikazTrenutne, stanje, vratiKartu, odigrajKartu, refresuj);
+		preskoci.setOnAction(e -> {
+			vratiKartu.setDisable(true);
+			odigrajKartu.setDisable(true);
+			client.toServer("5").thenApply(res -> {
+				Platform.runLater(() -> {
+					prikazTrenutne.setText(res + Client.naPotezu);
+				});
+
+				return res;
+			});
+		});
+
+		root.getChildren().addAll(listView, prikazTrenutne, stanje, vratiKartu, preskoci, odigrajKartu, refresuj);
 		Scene scene = new Scene(root, 400, 400);
 
 		primaryStage.setScene(scene);

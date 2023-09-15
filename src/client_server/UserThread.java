@@ -72,6 +72,11 @@ public class UserThread extends Thread {
 					printWriter.println(Server.getTrenutnaKarta() + ", " + Server.getKartaListaSize());
 
 					printWriter.println(Server.getBroj());
+				} else if (clientMessage.equals("5")) {
+					printWriter.println(Server.getBroj());
+
+					int broj = Integer.parseInt(bufferedReader.readLine());
+					Server.setBroj(broj);
 				}
 			} while (!clientMessage.equals("exit"));
 		} catch (IOException ex) {

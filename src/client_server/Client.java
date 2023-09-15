@@ -102,6 +102,15 @@ public class Client {
 						}
 
 						future.complete(trenutnaKarta);
+					} else if (s.equals("5")) {
+						printWriter.println(getBroj());
+						line = bufferedReader.readLine();
+
+						if (getBroj() != Integer.parseInt(line)) {
+							naPotezu = ", na potezu";
+						} else {
+							naPotezu = "";
+						}
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
