@@ -18,6 +18,8 @@ public class Client {
 
 	private static String gotovo = "nastavi";
 
+	private static int broj = 1;
+
 	Client(Socket socket) {
 		try {
 			this.socket = socket;
@@ -49,6 +51,10 @@ public class Client {
 					} else if (s.equals("0")) {
 						trenutnaKarta = bufferedReader.readLine();
 
+						line = bufferedReader.readLine();
+
+						setBroj(Integer.parseInt(line));
+
 						future.complete(trenutnaKarta);
 					} else if (s.equals("1") || s.equals("2")) {
 						line = bufferedReader.readLine();
@@ -57,18 +63,26 @@ public class Client {
 							future.complete(line);
 						}
 					} else if (s.equals("3")) {
-						String trenutna = trenutnaKarta.split(", ")[0];
-						printWriter.println(Integer.parseInt(trenutna));
+						printWriter.println(getBroj());
+						line = bufferedReader.readLine();
 
-						if (getRuka().size() == 1) {
-							printWriter.println("gotovo");
-						} else {
-							printWriter.println("nastavi");
+						if (getBroj() != Integer.parseInt(line)) {
+							String trenutna = trenutnaKarta.split(", ")[0];
+							printWriter.println(Integer.parseInt(trenutna));
+
+							if (getRuka().size() == 1) {
+								printWriter.println("gotovo");
+							} else {
+								printWriter.println("nastavi");
+							}
+
+							Client.setGotovo(bufferedReader.readLine());
+
+							printWriter.println(getBroj());
+
+							future.complete(trenutnaKarta);
 						}
 
-						Client.setGotovo(bufferedReader.readLine());
-
-						future.complete(trenutnaKarta);
 					} else if (s.equals("4")) {
 						line = bufferedReader.readLine();
 
@@ -103,5 +117,13 @@ public class Client {
 
 	public synchronized static void setGotovo(String gotovo) {
 		Client.gotovo = gotovo;
+	}
+
+	public synchronized static int getBroj() {
+		return broj;
+	}
+
+	public synchronized static void setBroj(int broj) {
+		Client.broj = broj;
 	}
 }

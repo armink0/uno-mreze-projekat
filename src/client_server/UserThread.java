@@ -39,22 +39,34 @@ public class UserThread extends Thread {
 					printWriter.println(Server.getGotovo());
 				} else if (clientMessage.equals("0")) {
 					printWriter.println(Server.getTrenutnaKarta() + ", " + Server.getKartaListaSize());
+
+					printWriter.println(Server.getBroj());
+
+					Server.setBroj(Server.getBroj() + 1);
 				} else if (clientMessage.equals("1") || clientMessage.equals("2")) {
 					if (Server.getKartaListaSize() > 0) {
 						int karta = Server.getZadnjaKarta();
 						printWriter.println(karta + ", " + Server.getKartaListaSize());
 					}
 				} else if (clientMessage.equals("3")) {
-					String tk = bufferedReader.readLine();
-					Server.setTrenutnaKarta(Integer.parseInt(tk));
+					int broj = Integer.parseInt(bufferedReader.readLine());
+					printWriter.println(Server.getBroj());
 
-					clientMessage = bufferedReader.readLine();
+					if (broj != Server.getBroj()) {
+						String tk = bufferedReader.readLine();
+						Server.setTrenutnaKarta(Integer.parseInt(tk));
 
-					if (clientMessage.equals("gotovo")) {
-						Server.setGotovo("gotovo");
+						clientMessage = bufferedReader.readLine();
+
+						if (clientMessage.equals("gotovo")) {
+							Server.setGotovo("gotovo");
+						}
+
+						printWriter.println(Server.getGotovo());
+
+						broj = Integer.parseInt(bufferedReader.readLine());
+						Server.setBroj(broj);
 					}
-
-					printWriter.println(Server.getGotovo());
 				} else if (clientMessage.equals("4")) {
 					printWriter.println(Server.getTrenutnaKarta() + ", " + Server.getKartaListaSize());
 				}

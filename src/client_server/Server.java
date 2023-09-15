@@ -17,8 +17,9 @@ public class Server {
 	private static ArrayList<UserThread> korisniciLista = new ArrayList<>();
 	private static ArrayList<Integer> kartaLista = new ArrayList<>();
 	private static int trenutnaKarta;
-	
+
 	private static String gotovo = "nastavi";
+	private static int broj = 1;
 
 	public static void main(String[] args) {
 		Server server = new Server();
@@ -67,6 +68,14 @@ public class Server {
 		synchronized (korisniciLista) {
 			korisniciLista.stream().filter(u -> u != sender).forEach(u -> u.sendMessage(message));
 		}
+	}
+
+	public synchronized static int getBroj() {
+		return broj;
+	}
+
+	public synchronized static void setBroj(int broj) {
+		Server.broj = broj;
 	}
 
 	void execute() {

@@ -43,7 +43,7 @@ public class ClientController extends Application {
 			System.out.println("Uspjesna konekcija");
 
 			client.toServer("0").thenApply(res -> {
-				Platform.runLater(() -> prikazTrenutne.setText(res));
+				Platform.runLater(() -> prikazTrenutne.setText(res + ", " + Client.getBroj()));
 				return res;
 			});
 
@@ -89,7 +89,7 @@ public class ClientController extends Application {
 
 				client.toServer("3").thenApply(res -> {
 					Platform.runLater(() -> {
-						prikazTrenutne.setText(res);
+						prikazTrenutne.setText(res + ", " + Client.getBroj());
 
 						Client.updateRuka(res);
 
@@ -117,7 +117,7 @@ public class ClientController extends Application {
 		refresuj.setOnAction(e -> {
 			client.toServer("4").thenApply(res -> {
 				Platform.runLater(() -> {
-					prikazTrenutne.setText(res);
+					prikazTrenutne.setText(res + ", " + Client.getBroj());
 				});
 
 				return res;
