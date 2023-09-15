@@ -61,11 +61,8 @@ public class ClientController extends Application {
 				Platform.runLater(() -> {
 					zapocniPartiju.setOnAction(e -> {
 						if (Client.getBroj() > 2) {
-							Alert alert = new Alert(AlertType.ERROR);
-							alert.setTitle("Wrong Input");
-							alert.setHeaderText(null);
-							alert.setContentText("Please enter a valid input.");
-							Client.setBroj(2);
+							System.out.println("Vec ima dovoljan broj igraca");
+
 							primaryStage.close();
 						} else {
 							root.getChildren().remove(zapocniPartiju);
