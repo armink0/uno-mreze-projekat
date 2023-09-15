@@ -1,7 +1,6 @@
 package client_server;
 
 import java.net.Socket;
-import java.util.ArrayList;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -12,7 +11,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
@@ -32,12 +30,14 @@ public class ClientController extends Application {
 
 		Label stanje = new Label("");
 
-		Button vratiKartu = new Button("povuci kartu");
+		Button povuciKartu = new Button("povuci kartu");
+		povuciKartu.setDisable(true);
 
 		Button odigrajKartu = new Button("odigraj kartu");
 		odigrajKartu.setDisable(true);
 
 		Button preskoci = new Button("preskoci potez");
+		preskoci.setDisable(true);
 
 		Button refresuj = new Button("refresuj tabelu");
 
@@ -46,13 +46,14 @@ public class ClientController extends Application {
 			System.out.println("Uspjesna konekcija");
 
 			client.toServer("0").thenApply(res -> {
-				Platform.runLater(() -> prikazTrenutne.setText(res + ", " + Client.getBroj()));
+				Platform.runLater(() -> prikazTrenutne.setText(res));
 				return res;
 			}).thenRun(() -> {
 				for (int i = 0; i < Server.POCETNO; i++) {
 					client.toServer("1").thenApply(res -> {
 						Platform.runLater(() -> {
 							listView.getItems().clear();
+
 							Client.addRuka(res);
 
 							for (String karta : Client.getRuka()) {
@@ -69,32 +70,44 @@ public class ClientController extends Application {
 			// ignorisi
 		}
 
-		vratiKartu.setOnAction(e -> {
-			vratiKartu.setDisable(true);
-			client.toServer("2").thenApply(res -> {
-				Platform.runLater(() -> {
-					listView.getItems().clear();
+		povuciKartu.setOnAction(e -> {
+			povuciKartu.setDisable(true);
+			refresuj.setDisable(true);
 
-					Client.addRuka(res);
+			String s = prikazTrenutne.getText();
 
-					for (String karta : Client.getRuka()) {
-						listView.getItems().add(karta);
-					}
+			if (s.contains("na potezu")) {
+				System.out.println("aaaa");
+				client.toServer("2").thenApply(res -> {
+					Platform.runLater(() -> {
+						listView.getItems().clear();
+
+						Client.addRuka(res);
+
+						for (String karta : Client.getRuka()) {
+							listView.getItems().add(karta);
+						}
+					});
+
+					return res;
 				});
-
-				return res;
-			});
+			}
 		});
 
-		odigrajKartu.setOnAction(e -> {
+		odigrajKartu.setOnAction(e ->
+
+		{
 			String s = listView.getSelectionModel().getSelectedItem();
 
 			if (s != null) {
 				Client.trenutnaKarta = s;
 				odigrajKartu.setDisable(true);
-				vratiKartu.setDisable(true);
+				povuciKartu.setDisable(true);
+				preskoci.setDisable(true);
+				refresuj.setDisable(false);
 
 				client.toServer("3").thenApply(res -> {
+					System.out.println(Client.naPotezu);
 					Platform.runLater(() -> {
 						prikazTrenutne.setText(res);
 
@@ -106,7 +119,7 @@ public class ClientController extends Application {
 							Client.setGotovo("pobjeda");
 							stanje.setText("pobjeda");
 							stanje.setTextFill(Color.GREEN);
-							vratiKartu.setDisable(true);
+							povuciKartu.setDisable(true);
 							odigrajKartu.setDisable(true);
 							refresuj.setDisable(true);
 						}
@@ -120,6 +133,21 @@ public class ClientController extends Application {
 					return res;
 				});
 			}
+		});
+
+		preskoci.setOnAction(e -> {
+			povuciKartu.setDisable(true);
+			odigrajKartu.setDisable(true);
+			preskoci.setDisable(true);
+			refresuj.setDisable(false);
+
+			client.toServer("5").thenApply(res -> {
+				Platform.runLater(() -> {
+					prikazTrenutne.setText(res);
+				});
+
+				return res;
+			});
 		});
 
 		refresuj.setOnAction(e -> {
@@ -136,13 +164,14 @@ public class ClientController extends Application {
 							if (Client.getRuka().size() != 0) {
 								stanje.setText("poraz");
 								stanje.setTextFill(Color.RED);
-								vratiKartu.setDisable(true);
+								povuciKartu.setDisable(true);
 								odigrajKartu.setDisable(true);
 								refresuj.setDisable(true);
 							}
 						} else {
 							odigrajKartu.setDisable(false);
-							vratiKartu.setDisable(false);
+							povuciKartu.setDisable(false);
+							preskoci.setDisable(false);
 						}
 					});
 
@@ -151,19 +180,7 @@ public class ClientController extends Application {
 			});
 		});
 
-		preskoci.setOnAction(e -> {
-			vratiKartu.setDisable(true);
-			odigrajKartu.setDisable(true);
-			client.toServer("5").thenApply(res -> {
-				Platform.runLater(() -> {
-					prikazTrenutne.setText(res + Client.naPotezu);
-				});
-
-				return res;
-			});
-		});
-
-		root.getChildren().addAll(listView, prikazTrenutne, stanje, vratiKartu, preskoci, odigrajKartu, refresuj);
+		root.getChildren().addAll(listView, prikazTrenutne, stanje, povuciKartu, preskoci, odigrajKartu, refresuj);
 		Scene scene = new Scene(root, 400, 400);
 
 		primaryStage.setScene(scene);

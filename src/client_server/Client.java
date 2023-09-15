@@ -19,7 +19,7 @@ public class Client {
 	private static String gotovo = "nastavi";
 	public static String naPotezu = ", na potezu";
 
-	private static int broj = 1;
+	private static int broj = 0;
 
 	Client(Socket socket) {
 		try {
@@ -68,8 +68,8 @@ public class Client {
 						line = bufferedReader.readLine();
 
 						if (getBroj() != Integer.parseInt(line)) {
-							String trenutna = trenutnaKarta.split(", ")[0];
-							printWriter.println(Integer.parseInt(trenutna));
+							String trenutna = trenutnaKarta;
+							printWriter.println(trenutna);
 
 							if (getRuka().size() == 1) {
 								printWriter.println("gotovo");
@@ -111,6 +111,8 @@ public class Client {
 						} else {
 							naPotezu = "";
 						}
+
+						future.complete(trenutnaKarta);
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
