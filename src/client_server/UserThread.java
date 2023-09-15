@@ -28,8 +28,6 @@ public class UserThread extends Thread {
 			String clientMessage;
 			Server.setBroj(Server.getBroj() + 1);
 
-			// printWriter.println(Server.getBroj());
-
 			do {
 				// Read message from user
 				clientMessage = bufferedReader.readLine();
@@ -38,12 +36,12 @@ public class UserThread extends Thread {
 					break;
 				}
 
-				if (clientMessage.equals("-1")) {
+				if (clientMessage.equals("-2")) {
+					printWriter.println(Server.getBroj());
+				} else if (clientMessage.equals("-1")) {
 					printWriter.println(Server.getGotovo());
 				} else if (clientMessage.equals("0")) {
 					printWriter.println(Server.getTrenutnaKarta());
-
-					printWriter.println(Server.getBroj());
 				} else if (clientMessage.equals("1") || clientMessage.equals("2")) {
 					if (Server.getKartaListaSize() > 0) {
 						String karta = Server.getZadnjaKarta();

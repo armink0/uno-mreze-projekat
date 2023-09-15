@@ -40,12 +40,16 @@ public class Client {
 			public void run() {
 				// TODO Auto-generated method stub
 				try {
-					// setMaxBroj(Integer.parseInt(bufferedReader.readLine()));
-
 					printWriter.println(s);
 					String line;
 
-					if (s.equals("-1")) {
+					if (s.equals("-2")) {
+						line = bufferedReader.readLine();
+
+						setBroj(Integer.parseInt(line));
+
+						future.complete(line);
+					} else if (s.equals("-1")) {
 						line = bufferedReader.readLine();
 
 						Client.setGotovo(line);
@@ -53,10 +57,6 @@ public class Client {
 						future.complete(Client.getGotovo());
 					} else if (s.equals("0")) {
 						trenutnaKarta = bufferedReader.readLine();
-
-						line = bufferedReader.readLine();
-
-						setBroj(Integer.parseInt(line));
 
 						future.complete(trenutnaKarta);
 					} else if (s.equals("1") || s.equals("2")) {
@@ -85,11 +85,11 @@ public class Client {
 
 							naPotezu = ", na potezu";
 
-							future.complete(trenutnaKarta);
 						} else {
 							naPotezu = "";
 						}
 
+						future.complete(trenutnaKarta);
 					} else if (s.equals("4")) {
 						line = bufferedReader.readLine();
 
@@ -109,9 +109,9 @@ public class Client {
 						line = bufferedReader.readLine();
 
 						if (getBroj() != Integer.parseInt(line)) {
-							naPotezu = ", na potezu";
-						} else {
 							naPotezu = "";
+						} else {
+							naPotezu = ", na potezu";
 						}
 
 						future.complete(trenutnaKarta);

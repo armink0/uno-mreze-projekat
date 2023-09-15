@@ -8,6 +8,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -24,46 +26,82 @@ public class ClientController extends Application {
 		root.setPadding(new Insets(25));
 
 		Label prikazTrenutne = new Label("");
+		prikazTrenutne.setVisible(false);
 
 		ListView<String> listView = new ListView<>();
 		listView.setMaxSize(200, 200);
+		listView.setVisible(false);
 
 		Label stanje = new Label("");
 
-		Button povuciKartu = new Button("povuci kartu");
+		Button povuciKartu = new Button("Povuci kartu");
 		povuciKartu.setDisable(true);
+		povuciKartu.setVisible(false);
 
-		Button odigrajKartu = new Button("odigraj kartu");
+		Button odigrajKartu = new Button("Odigraj kartu");
 		odigrajKartu.setDisable(true);
+		odigrajKartu.setVisible(false);
 
-		Button preskoci = new Button("preskoci potez");
+		Button preskoci = new Button("Preskoci potez");
 		preskoci.setDisable(true);
+		preskoci.setVisible(false);
 
-		Button refresuj = new Button("refresuj tabelu");
+		Button refresuj = new Button("Refresuj tabelu");
+		refresuj.setVisible(false);
+
+		Button zapocniPartiju = new Button("Pocni partiju");
 
 		try {
 			client = new Client(new Socket(Server.LOCALHOST, Server.DEFAULT_PORT));
 			System.out.println("Uspjesna konekcija");
 
-			client.toServer("0").thenApply(res -> {
-				Platform.runLater(() -> prikazTrenutne.setText(res));
+			client.toServer("-2").thenApply(res -> {
+				Platform.runLater(() -> {
+					zapocniPartiju.setOnAction(e -> {
+						if (Client.getBroj() > 2) {
+							Alert alert = new Alert(AlertType.ERROR);
+							alert.setTitle("Wrong Input");
+							alert.setHeaderText(null);
+							alert.setContentText("Please enter a valid input.");
+							Client.setBroj(2);
+							primaryStage.close();
+						} else {
+							root.getChildren().remove(zapocniPartiju);
+							prikazTrenutne.setVisible(true);
+							listView.setVisible(true);
+							povuciKartu.setVisible(true);
+							odigrajKartu.setVisible(true);
+							preskoci.setVisible(true);
+							refresuj.setVisible(true);
+						}
+					});
+				});
+
 				return res;
 			}).thenRun(() -> {
-				for (int i = 0; i < Server.POCETNO; i++) {
-					client.toServer("1").thenApply(res -> {
-						Platform.runLater(() -> {
-							listView.getItems().clear();
-
-							Client.addRuka(res);
-
-							for (String karta : Client.getRuka()) {
-								listView.getItems().add(karta);
-							}
-						});
-
-						return res;
+				client.toServer("0").thenApply(res -> {
+					Platform.runLater(() -> {
+						prikazTrenutne.setText(res);
 					});
-				}
+
+					return res;
+				}).thenRun(() -> {
+					for (int i = 0; i < Server.POCETNO; i++) {
+						client.toServer("1").thenApply(res -> {
+							Platform.runLater(() -> {
+								listView.getItems().clear();
+
+								Client.addRuka(res);
+
+								for (String karta : Client.getRuka()) {
+									listView.getItems().add(karta);
+								}
+							});
+
+							return res;
+						});
+					}
+				});
 			});
 
 		} catch (Exception e) {
@@ -79,6 +117,8 @@ public class ClientController extends Application {
 			if (s.contains("na potezu")) {
 				client.toServer("2").thenApply(res -> {
 					Platform.runLater(() -> {
+						System.out.println("aaaa");
+
 						listView.getItems().clear();
 
 						Client.addRuka(res);
@@ -176,7 +216,8 @@ public class ClientController extends Application {
 			});
 		});
 
-		root.getChildren().addAll(listView, prikazTrenutne, stanje, povuciKartu, preskoci, odigrajKartu, refresuj);
+		root.getChildren().addAll(listView, zapocniPartiju, prikazTrenutne, stanje, povuciKartu, preskoci, odigrajKartu,
+				refresuj);
 		Scene scene = new Scene(root, 400, 400);
 
 		primaryStage.setScene(scene);
