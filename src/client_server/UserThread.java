@@ -46,6 +46,8 @@ public class UserThread extends Thread {
 					if (Server.getKartaListaSize() > 0) {
 						String karta = Server.getZadnjaKarta();
 						printWriter.println(karta);
+					} else {
+						System.out.println("Nema vise karata");
 					}
 				} else if (clientMessage.equals("3")) {
 					int broj = Integer.parseInt(bufferedReader.readLine());

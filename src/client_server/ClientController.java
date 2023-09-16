@@ -118,8 +118,10 @@ public class ClientController extends Application {
 
 					Platform.runLater(() -> {
 						listView.getItems().clear();
-
-						Client.addRuka(res);
+						
+						if (!res.equals("nastavi")) {
+							Client.addRuka(res);
+						}
 
 						for (String karta : Client.getRuka()) {
 							listView.getItems().add(karta);
@@ -250,6 +252,8 @@ public class ClientController extends Application {
 								&& trenutnaKarta.contains("na potezu")) {
 							preskoci.setDisable(true);
 						}
+						
+						refresuj.setDisable(false);
 					});
 
 					return res;

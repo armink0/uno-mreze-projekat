@@ -35,7 +35,7 @@ public class Server {
 	}
 
 	public synchronized static String oduzmiKartaLista() {
-		String n = null;
+		String n = "-1, -1";
 
 		if (kartaLista.size() > 0) {
 			n = kartaLista.remove(kartaLista.size() - 1);
@@ -53,7 +53,13 @@ public class Server {
 	}
 
 	public synchronized static String getZadnjaKarta() {
-		return kartaLista.remove(kartaLista.size() - 1);
+		String karta = "-1, -1";
+
+		if (kartaLista.size() > 0) {
+			karta = kartaLista.remove(kartaLista.size() - 1);
+		}
+
+		return karta;
 	}
 
 	public synchronized static String getGotovo() {
